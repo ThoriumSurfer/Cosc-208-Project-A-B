@@ -16,7 +16,7 @@ public class Main {
         
         Scanner userInput = new Scanner(System.in);
 
-        System.out.printf("Hello and welcome!");
+        System.out.println("Hello and welcome!");
         
         
         String busOrTrain = userInput.nextLine();
