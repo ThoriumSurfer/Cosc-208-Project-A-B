@@ -15,12 +15,22 @@ public class Main {
     public static void main(String[] args) {
         
         Scanner userInput = new Scanner(System.in);
-
+        
         System.out.println("Hello and welcome!");
         
-        
         String busOrTrain = userInput.nextLine();
+        // Create the input object
+        Bus_Train_Input input = new Bus_Train_Input();
         
+        // Collect the user's information
+        input.Bus_Inputs();
+        input.Train_Inputs();
+        
+        // Create the logic object and pass it the input
+        Bus_Train_Logic logic = new Bus_Train_Logic(input);
+        
+        // Evaluate the bus and train propositions
+        logic.evaluatePropositions();
         
     }
     
