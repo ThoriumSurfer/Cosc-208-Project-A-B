@@ -59,8 +59,9 @@ public class Recommendation_Algorithm {
                 validScore = true;
                 
                 try {
-                    System.out.println("How much do you prioritize " + categories[i] + " use 1 to 4, 4 " +
+                    System.out.println("\nHow much do you prioritize " + categories[i] + " use 1 to 4, 4 " +
                             "being the most important and 1 being least important (1-4): ");
+                    
                     choice = userInput.nextInt();
                     
                 } catch (InputMismatchException e) {
@@ -69,7 +70,7 @@ public class Recommendation_Algorithm {
                     
                     validScore = false;
                     
-                    System.out.println("Please enter an integer.");
+                    System.out.println("\nPlease enter an integer.");
                     
                 }
                 
@@ -91,7 +92,7 @@ public class Recommendation_Algorithm {
                 if (validScore) {
                     priorities[i] = choice;
                 } else {
-                    System.out.println("Invalid or already-used priority. Try again.");
+                    System.out.println("\nInvalid or already-used priority. Try again.");
                 }
                 
             } while (!validScore);
@@ -172,14 +173,18 @@ public class Recommendation_Algorithm {
             System.out.println("Total Score: " + recommendedBus.getTotalScore());
             
         } else {
+            
             System.out.println("\nThere are no buses available for you currently.");
+            
         }
         
         
         // RESET SCORES BEFORE TRAIN SCORING
         
         for (Transportation transport : totalTransport) {
+            
             transport.resetScore();
+            
         }
         
         

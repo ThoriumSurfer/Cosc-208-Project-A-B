@@ -57,7 +57,7 @@ public class Transportation {
     
     @Override
     public String toString() {
-        return "Fare: " + fare +
+        return "Vehicle: " + vehicleName + " \nFare: " + fare +
                 ", Walking Time: " + walkTime +
                 ", Travel Time: " + travelTime;
     }
