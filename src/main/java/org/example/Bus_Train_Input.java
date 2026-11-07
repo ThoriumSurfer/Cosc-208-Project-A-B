@@ -4,6 +4,7 @@ package org.example;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -16,31 +17,37 @@ public class Bus_Train_Input {
     
     private LocalTime deadline;
     
-    private LocalTime currentTime;
+    private LocalTime currentTime = LocalTime.now();
     
     private double budget;
     
     private String weather;
     
-    private int busWalkTime;
+    private double busWalkTime;
     
-    private int trainWalkTime;
+    private double trainWalkTime;
     
     private boolean busService;
     
     private boolean trainService;
     
-    private int busTravelTime;
+    private double busTravelTime;
     
-    private int trainTravelTime;
+    private double trainTravelTime;
     
-    private int busFare;
+    private double busFare;
     
-    private int trainFare;
+    private double trainFare;
+    
+    private ArrayList<Transportation> buses = new ArrayList<>();
+    
+    private ArrayList<Transportation> trains = new ArrayList<>();
+    
+    private Transportation busObject;
+    
+    private Transportation trainObject;
     
     public static void main(String[] args) {
-        
-        System.out.println("Hello, World!");
 
     }
     
@@ -59,6 +66,15 @@ public class Bus_Train_Input {
         this.trainFare = trainFare;
     }
     
+    public void Budget_Input() {
+        
+        System.out.println("\nEnter your budget: ");
+        
+        budget = userInput.nextDouble();
+        
+        userInput.nextLine();
+    }
+    
     public void Bus_Inputs ()
     {
         boolean validInput = false;
@@ -66,25 +82,8 @@ public class Bus_Train_Input {
         while (!validInput) {
             try {
                 
-                System.out.println("\nPlease insert the deadline for the bus arrival: ");
+                System.out.println("\nPlease insert the deadline for the bus arrival (HH:mm): ");
                 deadline = LocalTime.parse(userInput.nextLine());
-                
-                System.out.println("\nEnter your budget: ");
-                budget = userInput.nextDouble();
-                
-                System.out.println("\nPlease enter either 'Sunny', Cloudy', 'Rainy'. or 'Intense Weather: ");
-                weather = userInput.nextLine();
-                
-                if (!weather.equalsIgnoreCase("Sunny") &&
-                        !weather.equalsIgnoreCase("Cloudy") &&
-                        !weather.equalsIgnoreCase("Rainy") &&
-                        !weather.equalsIgnoreCase("Intense Weather")) {
-                    
-                    throw new InvalidInputException("\nYou didn't input the correct weather!");
-                }
-                
-                System.out.println("\nPlease enter the walk time it takes to reach the bus stop: ");
-                this.busWalkTime = userInput.nextInt();
                 
                 System.out.println("\nIs the bus in service? Please type yes or no: ");
                 String serviceAnswer = userInput.nextLine();
@@ -93,18 +92,32 @@ public class Bus_Train_Input {
                         !serviceAnswer.equalsIgnoreCase("No")
                         ) {
                     
-                    throw new InvalidInputException("\nYou didn't input the correct weather!");
+                    throw new InvalidInputException("\nPlease input yes or no!");
                 } else {
                     
-                    busService = true;
+                    busService = serviceAnswer.equalsIgnoreCase("Yes");
                     
                 }
                 
-                System.out.println("\nPlease enter the bus travel time: ");
-                busTravelTime = userInput.nextInt();
-                
                 System.out.println("\nPlease enter the bus fare: ");
                 busFare = userInput.nextInt();
+                
+                System.out.println("\nPlease enter the walk time it takes to reach the bus stop (in Minutes): ");
+                busWalkTime = userInput.nextInt();
+                
+                System.out.println("\nPlease enter the bus travel time (in Minutes): ");
+                busTravelTime = userInput.nextInt();
+                
+                userInput.nextLine();
+                
+                System.out.println("\nPlease enter either 'Sunny' or 'Intense Weather: ");
+                weather = userInput.nextLine();
+                
+                if (!weather.equalsIgnoreCase("Sunny") &&
+                        !weather.equalsIgnoreCase("Intense Weather")) {
+                    
+                    throw new InvalidInputException("\nYou didn't input the correct weather!");
+                }
                 
                 validInput = true;
                 
@@ -118,6 +131,19 @@ public class Bus_Train_Input {
             }
         }
         
+        busObject = new Transportation("Bus " + (buses.size() + 1), busFare, busWalkTime,
+                busTravelTime, weather);
+        
+        buses.add(busObject);
+        
+        for (int i = 0; i < buses.size(); i++) {
+            
+            System.out.println("");
+        
+            System.out.println(buses.get(i));
+        
+        }
+        
     }
     
     public void Train_Inputs () {
@@ -126,51 +152,51 @@ public class Bus_Train_Input {
         while (!validInput) {
             try {
                 
-                System.out.println("\nPlease insert the deadline for the train arrival: ");
+                System.out.println("\nPlease insert the deadline for the train arrival (HH:mm): ");
                 deadline = LocalTime.parse(userInput.nextLine());
-                
-                System.out.println("\nEnter your budget: ");
-                budget = userInput.nextDouble();
-                
-                System.out.println("\nPlease enter either 'Sunny', Cloudy', 'Rainy'. or 'Intense Weather: ");
-                weather = userInput.nextLine();
-                
-                if (!weather.equalsIgnoreCase("Sunny") &&
-                        !weather.equalsIgnoreCase("Cloudy") &&
-                        !weather.equalsIgnoreCase("Rainy") &&
-                        !weather.equalsIgnoreCase("Intense Weather")) {
-                    
-                    throw new InvalidInputException("\nYou didn't input the correct weather!");
-                }
-                
-                System.out.println("\nPlease enter the walk time it takes to reach the station: ");
-                trainWalkTime = userInput.nextInt();
                 
                 System.out.println("\nIs the train in service? Please type yes or no: ");
                 String serviceAnswer = userInput.nextLine();
                 
                 if (!serviceAnswer.equalsIgnoreCase("Yes") &&
-                        !serviceAnswer.equalsIgnoreCase("No")
-                ) {
+                        !serviceAnswer.equalsIgnoreCase("No")) {
                     
-                    throw new InvalidInputException("\nYou didn't input the correct weather!");
+                    throw new InvalidInputException("\nPlease input yes or no!");
+                    
                 } else {
                     
-                    trainService = true;
+                    trainService = serviceAnswer.equalsIgnoreCase("Yes");
                     
                 }
                 
-                System.out.println("\nPlease enter the train travel time: ");
-                trainTravelTime = userInput.nextInt();
-                
                 System.out.println("\nPlease enter the train fare: ");
-                trainFare = userInput.nextInt();
+                trainFare = userInput.nextDouble();
+                
+                System.out.println("\nPlease enter the walk time it takes to reach the station (in Minutes): ");
+                trainWalkTime = userInput.nextDouble();
+                
+                System.out.println("\nPlease enter the train travel time (in Minutes): ");
+                trainTravelTime = userInput.nextDouble();
+                
+                userInput.nextLine();
+                
+                System.out.println("\nPlease enter either 'Sunny' or 'Intense Weather: ");
+                weather = userInput.nextLine();
+                
+                if (!weather.equalsIgnoreCase("Sunny") &&
+                        !weather.equalsIgnoreCase("Intense Weather")) {
+                    
+                    throw new InvalidInputException("\nYou didn't input the correct weather!");
+                    
+                }
                 
                 validInput = true;
                 
             } catch (InputMismatchException | DateTimeParseException e) {
+                
                 System.out.println("\nThat input is invalid, please enter the correct value");
-                userInput.nextLine(); // Clears invalid input
+                userInput.nextLine();
+                
             } catch (InvalidInputException e) {
                 
                 System.out.println("\n" + e.getMessage());
@@ -178,33 +204,53 @@ public class Bus_Train_Input {
             }
         }
         
+        trainObject = new Transportation("Train " + (trains.size() + 1),
+                trainFare, trainWalkTime, trainTravelTime, weather);
+        
+        trains.add(trainObject);
+        
+        for (int i = 0; i < trains.size(); i++) {
+            
+            System.out.println("");
+            
+            System.out.println(trains.get(i));
+            
+        }
+        
     }
     
     public LocalTime getDeadline() {
+        
         return deadline;
     }
     
     public LocalTime  getCurrentTime() {
+        
         return currentTime;
     }
     
     public double getBudget() {
+        
         return budget;
     }
     
     public String getWeather() {
+        
         return weather;
     }
     
-    public int getBusWalkTime() {
+    public double getBusWalkTime() {
+        
         return busWalkTime;
     }
     
-    public int getTrainWalkTime() {
+    public double getTrainWalkTime() {
+        
         return trainWalkTime;
     }
     
     public boolean getBusService() {
+        
         return busService;
     }
     
@@ -212,20 +258,42 @@ public class Bus_Train_Input {
         return trainService;
     }
     
-    public int getBusTravelTime() {
+    public double getBusTravelTime() {
+        
         return busTravelTime;
     }
     
-    public int getTrainTravelTime() {
+    public double getTrainTravelTime() {
+        
         return trainTravelTime;
     }
     
-    public int getBusFare() {
+    public double getBusFare() {
+        
         return busFare;
     }
     
-    public int getTrainFare() {
+    public double getTrainFare() {
+        
         return trainFare;
+    }
+    
+    public ArrayList<Transportation> getBuses() {
+        
+        return buses;
+        
+    }
+    
+    public ArrayList<Transportation> getTrains() {
+        
+        return trains;
+        
+    }
+    
+    public Scanner getUserInput() {
+        
+        return userInput;
+        
     }
     
     /*
