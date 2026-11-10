@@ -7,9 +7,11 @@ import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-/*Cosc 208 Project A and B
+/*
+Cosc 208 Project A and B
 This Project is Meant to take the inout of the user that determines whether the
- Makail Casey*/
+ Makail Casey
+ */
 
 public class Main {
     
@@ -52,7 +54,7 @@ public class Main {
                     
                     input.Train_Inputs();
                     
-                    System.out.println("\nDo you want to add another bus? yes/no: ");
+                    System.out.println("\nDo you want to add another train? yes/no: ");
                     
                     endLoop = yes_Or_No(userInput);
                     
@@ -71,6 +73,9 @@ public class Main {
                     endLoop = yes_Or_No(userInput);
                     
                 }
+                
+                userOptions += 1;
+                
             } catch (InputMismatchException e){
                 
                 System.out.println("\nPlease type yes or no!");
@@ -81,10 +86,7 @@ public class Main {
                 System.out.println("\n" + e.getMessage());
                 
             }
-            userOptions += 1;
         }
-        
-        Recommendation_Algorithm algorithm = new Recommendation_Algorithm(input);
         
         // Create the logic object and pass it the input
         Bus_Train_Logic logic = new Bus_Train_Logic(input);
@@ -92,7 +94,7 @@ public class Main {
         // Evaluate the bus and train propositions
         logic.evaluateLogic();
         
-        Recommendation_Algorithm recommendation = new Recommendation_Algorithm(input);
+        Recommendation_Algorithm recommendation = new Recommendation_Algorithm(input, logic);
         
         recommendation.Determine_Priority();
         

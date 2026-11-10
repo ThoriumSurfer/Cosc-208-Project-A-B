@@ -57,52 +57,52 @@ public class Bus_Train_Logic {
     
     public void evaluateLogic() {
         
-        busOp = bTInput.getBusService();
+        viableBuses.clear();
         
-        busFareOp = bTInput.getBusFare() <= bTInput.getBudget();
+        viableTrains.clear();
         
-        busDeadlineOp = bTInput.getCurrentTime()
-                .plusMinutes((long) Math.ceil(bTInput.getBusWalkTime() + bTInput.getBusTravelTime()))
-                .isBefore(bTInput.getDeadline());
+        viableBackupRides.clear();
         
-        busWalkTimeOp = !bTInput.getWeather().equalsIgnoreCase("Severe");
+        busOp = bTInput.getBuses().stream().anyMatch(bus -> bus.getServiceOperation());
         
-        busViable = busOp && busFareOp && busDeadlineOp;
+        busFareOp = bTInput.getBuses().stream()
+                .anyMatch(bus -> bus.getFare() <= bTInput.getBudget());
         
-        trainOp = bTInput.getTrainService();
+        busWalkTimeOp = bTInput.getBuses().stream()
+                .anyMatch(bus -> bTInput.getBuses().stream()
+                        .anyMatch(otherBus -> bus.getWalkTime() < otherBus.getWalkTime()));
         
-        trainFareOp = bTInput.getTrainFare() <= bTInput.getBudget();
+        trainOp = bTInput.getTrains().stream()
+                .anyMatch(train -> train.getServiceOperation());
         
-        trainDeadlineOp = bTInput.getCurrentTime()
-                .plusMinutes((long) Math.ceil(bTInput.getTrainWalkTime() + bTInput.getTrainTravelTime()))
-                .isBefore(bTInput.getDeadline());
+        trainFareOp = bTInput.getTrains().stream()
+                .anyMatch(train -> train.getFare() <= bTInput.getBudget());
         
-        trainWalkTimeOp = !bTInput.getWeather().equalsIgnoreCase("Severe");
+        trainWalkTimeOp = bTInput.getTrains().stream()
+                .anyMatch(train -> bTInput.getTrains().stream()
+                        .anyMatch(otherTrain -> train.getWalkTime() < otherTrain.getWalkTime()));
         
-        trainViable = trainOp && trainFareOp && trainDeadlineOp && trainWalkTimeOp;
+        backupRideOp = bTInput.getBackupRides().stream()
+                .anyMatch(backupRide -> backupRide.getServiceOperation());
         
-        backupRideOp = bTInput.getBackupRideService();
+        backupRideFareOp = bTInput.getBackupRides().stream()
+                .anyMatch(backupRide -> backupRide.getFare() <= bTInput.getBudget());
         
-        backupRideFareOp = bTInput.getBackupRideFare() <= bTInput.getBudget();
-        
-        backupRideDeadlineOp = bTInput.getCurrentTime()
-                .plusMinutes((long) bTInput.getBackupRideTravelTime())
-                .isBefore(bTInput.getDeadline());
-        
-        backupRideWalkTimeOp = !bTInput.getWeather().equalsIgnoreCase("Severe");
-        
-        backupRideViable = backupRideOp && backupRideFareOp &&
-                backupRideDeadlineOp && backupRideWalkTimeOp;
+        backupRideWalkTimeOp = bTInput.getBackupRides().stream()
+                .anyMatch(ride -> bTInput.getBackupRides().stream()
+                        .anyMatch(otherRide -> ride.getWalkTime() < otherRide.getWalkTime()));
         
         for (Transportation bus : bTInput.getBuses()) {
+            
+            boolean serviceValid = bus.getServiceOperation();
             
             boolean fareValid = bus.getFare() <= bTInput.getBudget();
             
             boolean deadlineValid = bTInput.getCurrentTime()
                     .plusMinutes((long) Math.ceil(bus.getWalkTime() + bus.getTravelTime()))
-                    .isBefore(bTInput.getDeadline());
+                    .isBefore(bus.getDeadline());
             
-            if (busOp && fareValid && deadlineValid) {
+            if (serviceValid && fareValid && deadlineValid) {
                 viableBuses.add(bus);
             }
         }
@@ -114,29 +114,47 @@ public class Bus_Train_Logic {
             
             boolean deadlineValid = bTInput.getCurrentTime()
                     .plusMinutes((long) Math.ceil(train.getWalkTime() + train.getTravelTime()))
-                    .isBefore(bTInput.getDeadline());
+                    .isBefore(train.getDeadline());
             
-            boolean weatherValid = train.getWeather().equalsIgnoreCase("Sunny");
+            boolean serviceValid = train.getServiceOperation();
             
-            if (trainOp && fareValid && deadlineValid && weatherValid) {
+            if (serviceValid && fareValid && deadlineValid) {
                 viableTrains.add(train);
             }
         }
         
         for (Transportation backupRide : bTInput.getBackupRides()) {
             
+            boolean serviceValid = backupRide.getServiceOperation();
+            
             boolean fareValid = backupRide.getFare() <= bTInput.getBudget();
             
             boolean deadlineValid = bTInput.getCurrentTime()
-                    .plusMinutes((long) backupRide.getTravelTime())
-                    .isBefore(bTInput.getDeadline());
+                    .plusMinutes((long) Math.ceil(backupRide.getWalkTime() + backupRide.getTravelTime()))
+                    .isBefore(backupRide.getDeadline());
             
-            boolean weatherValid = !backupRide.getWeather().equalsIgnoreCase("Severe");
-            
-            if (backupRideOp && fareValid && deadlineValid && weatherValid) {
+            if (serviceValid && fareValid && deadlineValid) {
                 viableBackupRides.add(backupRide);
             }
         }
+        
+        busViable = !viableBuses.isEmpty();
+        
+        trainViable = !viableTrains.isEmpty();
+        
+        backupRideViable = !viableBackupRides.isEmpty();
+        
+        busDeadlineOp = bTInput.getBuses().stream().anyMatch(bus ->
+                bTInput.getCurrentTime().plusMinutes((long) Math.ceil(bus.getWalkTime()
+                        + bus.getTravelTime())).isBefore(bus.getDeadline()));
+        
+        trainDeadlineOp = bTInput.getTrains().stream().anyMatch(train ->
+                bTInput.getCurrentTime().plusMinutes((long) Math.ceil(train.getWalkTime()
+                        + train.getTravelTime())).isBefore(train.getDeadline()));
+        
+        backupRideDeadlineOp = bTInput.getBackupRides().stream().anyMatch(backupRide ->
+                bTInput.getCurrentTime().plusMinutes((long) Math.ceil(backupRide.getWalkTime()
+                        + backupRide.getTravelTime())).isBefore(backupRide.getDeadline()));
     }
     
     public boolean getBusOp() {
@@ -234,6 +252,13 @@ public class Bus_Train_Logic {
         return viableTrains;
         
     }
-
+    
+/*busViable = busOp && busFareOp && busDeadlineOp;
+        
+        trainViable = trainOp && trainFareOp && trainDeadlineOp && trainWalkTimeOp;
+        
+        backupRideViable = backupRideOp && backupRideFareOp &&
+                backupRideDeadlineOp && backupRideWalkTimeOp;*/
+    
     
 }

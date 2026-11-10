@@ -37,12 +37,12 @@ public class Recommendation_Algorithm {
     
     }
     
-    public Recommendation_Algorithm(Bus_Train_Input input) {
+    public Recommendation_Algorithm(Bus_Train_Input input, Bus_Train_Logic logic) {
         this.input = input;
         this.userInput = input.getUserInput();
-        this.buses = input.getBuses();
-        this.trains = input.getTrains();
-        this.backupRides = input.getBackupRides();
+        this.buses = logic.getViableBuses();
+        this.trains = logic.getViableTrains();
+        this.backupRides = logic.getViableBackupRides();
         totalTransport.addAll(buses);
         totalTransport.addAll(trains);
         totalTransport.addAll(backupRides);
@@ -239,6 +239,8 @@ public class Recommendation_Algorithm {
                     
                     trains.get(j).addScore(weightedScore[3]);
                 }
+                
+                
             }
         }
         

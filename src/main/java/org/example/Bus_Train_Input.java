@@ -143,8 +143,8 @@ public class Bus_Train_Input {
             }
         }
         
-        busObject = new Transportation("Bus " + (buses.size() + 1), busFare, busWalkTime,
-                busTravelTime, weather);
+        busObject = new Transportation("Bus " + (buses.size() + 1),
+                busFare, busWalkTime, busTravelTime, weather, busService, deadline);
         
         buses.add(busObject);
         
@@ -217,7 +217,7 @@ public class Bus_Train_Input {
         }
         
         trainObject = new Transportation("Train " + (trains.size() + 1),
-                trainFare, trainWalkTime, trainTravelTime, weather);
+                trainFare, trainWalkTime, trainTravelTime, weather, trainService, deadline);
         
         trains.add(trainObject);
         
@@ -290,7 +290,7 @@ public class Bus_Train_Input {
         }
         
         backupRideObject = new Transportation("Backup Ride " + (backupRides.size() + 1),
-                backupRideFare, backupRideWalkTime, backupRideTravelTime, weather);
+                backupRideFare, backupRideWalkTime, backupRideTravelTime, weather, backupRideService, deadline);
         
         backupRides.add(backupRideObject);
         
@@ -339,6 +339,7 @@ public class Bus_Train_Input {
     }
     
     public boolean getTrainService() {
+        
         return trainService;
     }
     
