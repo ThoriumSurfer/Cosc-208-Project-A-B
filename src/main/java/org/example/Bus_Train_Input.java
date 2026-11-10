@@ -10,7 +10,10 @@ import java.util.Scanner;
 
 
 
-
+/* This is where the inputs for each value for Bus/Train/and Backupride is Evaluated. Deadline, currentTIme,
+budget weather, walktime's for each, traveltime for each, fares for each, and if each of them are even
+in service in the first place.
+ */
 public class Bus_Train_Input {
     
     private Scanner userInput = new Scanner(System.in);
