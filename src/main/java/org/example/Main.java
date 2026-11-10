@@ -8,6 +8,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /*Cosc 208 Project A and B
+This Project is Meant to take the inout of the user that determines whether the
  Makail Casey*/
 
 public class Main {
@@ -52,6 +53,20 @@ public class Main {
                     input.Train_Inputs();
                     
                     System.out.println("\nDo you want to add another bus? yes/no: ");
+                    
+                    endLoop = yes_Or_No(userInput);
+                    
+                }
+                
+                System.out.println("\nDo you want to add a backup ride? Please type yes or no: ");
+                
+                endLoop = yes_Or_No(userInput);
+                
+                while (endLoop.equalsIgnoreCase("yes")) {
+                    
+                    input.Backup_Ride_Inputs();
+                    
+                    System.out.println("\nDo you want to add another backup ride? Please type yes or no: ");
                     
                     endLoop = yes_Or_No(userInput);
                     

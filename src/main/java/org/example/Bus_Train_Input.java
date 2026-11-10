@@ -39,6 +39,18 @@ public class Bus_Train_Input {
     
     private double trainFare;
     
+    private double backupRideWalkTime;
+    
+    private boolean backupRideService;
+    
+    private double backupRideTravelTime;
+    
+    private double backupRideFare;
+    
+    private ArrayList<Transportation> backupRides = new ArrayList<>();
+    
+    private Transportation backupRideObject;
+    
     private ArrayList<Transportation> buses = new ArrayList<>();
     
     private ArrayList<Transportation> trains = new ArrayList<>();
@@ -219,6 +231,78 @@ public class Bus_Train_Input {
         
     }
     
+    public void Backup_Ride_Inputs() {
+        boolean validInput = false;
+        
+        while (!validInput) {
+            try {
+                
+                System.out.println("\nPlease insert the deadline for the backup ride arrival (HH:mm): ");
+                deadline = LocalTime.parse(userInput.nextLine());
+                
+                System.out.println("\nIs the backup ride available? Please type yes or no: ");
+                String serviceAnswer = userInput.nextLine();
+                
+                if (!serviceAnswer.equalsIgnoreCase("Yes") &&
+                        !serviceAnswer.equalsIgnoreCase("No")) {
+                    
+                    throw new InvalidInputException("\nPlease input yes or no!");
+                    
+                } else {
+                    
+                    backupRideService = serviceAnswer.equalsIgnoreCase("Yes");
+                    
+                }
+                
+                System.out.println("\nPlease enter the backup ride fare: ");
+                backupRideFare = userInput.nextDouble();
+                
+                System.out.println("\nPlease enter the walk time it takes to reach the backup ride (in Minutes): ");
+                backupRideWalkTime = userInput.nextDouble();
+                
+                System.out.println("\nPlease enter the backup ride travel time (in Minutes): ");
+                backupRideTravelTime = userInput.nextDouble();
+                
+                userInput.nextLine();
+                
+                System.out.println("\nPlease enter either 'Sunny' or 'Intense Weather': ");
+                weather = userInput.nextLine();
+                
+                if (!weather.equalsIgnoreCase("Sunny") &&
+                        !weather.equalsIgnoreCase("Intense Weather")) {
+                    
+                    throw new InvalidInputException("\nYou didn't input the correct weather!");
+                    
+                }
+                
+                validInput = true;
+                
+            } catch (InputMismatchException | DateTimeParseException e) {
+                
+                System.out.println("\nThat input is invalid, please enter the correct value");
+                userInput.nextLine();
+                
+            } catch (InvalidInputException e) {
+                
+                System.out.println("\n" + e.getMessage());
+                
+            }
+        }
+        
+        backupRideObject = new Transportation("Backup Ride " + (backupRides.size() + 1),
+                backupRideFare, backupRideWalkTime, backupRideTravelTime, weather);
+        
+        backupRides.add(backupRideObject);
+        
+        for (int i = 0; i < backupRides.size(); i++) {
+            
+            System.out.println("");
+            
+            System.out.println(backupRides.get(i));
+            
+        }
+    }
+    
     public LocalTime getDeadline() {
         
         return deadline;
@@ -294,6 +378,26 @@ public class Bus_Train_Input {
         
         return userInput;
         
+    }
+    
+    public double getBackupRideWalkTime() {
+        return backupRideWalkTime;
+    }
+    
+    public boolean getBackupRideService() {
+        return backupRideService;
+    }
+    
+    public double getBackupRideTravelTime() {
+        return backupRideTravelTime;
+    }
+    
+    public double getBackupRideFare() {
+        return backupRideFare;
+    }
+    
+    public ArrayList<Transportation> getBackupRides() {
+        return backupRides;
     }
     
     /*

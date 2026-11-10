@@ -26,6 +26,8 @@ public class Recommendation_Algorithm {
     
     private ArrayList<Transportation> trains;
     
+    private ArrayList<Transportation> backupRides;
+    
     private ArrayList<Transportation> totalTransport = new ArrayList<>();
     
     private Bus_Train_Input input;
@@ -40,8 +42,10 @@ public class Recommendation_Algorithm {
         this.userInput = input.getUserInput();
         this.buses = input.getBuses();
         this.trains = input.getTrains();
+        this.backupRides = input.getBackupRides();
         totalTransport.addAll(buses);
         totalTransport.addAll(trains);
+        totalTransport.addAll(backupRides);
     }
     
     public void Determine_Priority() {
@@ -260,6 +264,91 @@ public class Recommendation_Algorithm {
             
         } else {
             System.out.println("\nThere are no trains available for you currently.");
+        }
+        
+        for (Transportation transport : totalTransport) {
+            
+            transport.resetScore();
+            
+        }
+
+
+// BACKUP RIDE-ONLY SCORING
+        
+        for (int i = 0; i < backupRides.size(); i++) {
+            
+            for (int j = i + 1; j < backupRides.size(); j++) {
+                
+                if (backupRides.get(i).getFare() < backupRides.get(j).getFare()) {
+                    
+                    backupRides.get(i).addScore(weightedScore[0]);
+                    
+                } else if (backupRides.get(j).getFare() < backupRides.get(i).getFare()) {
+                    
+                    backupRides.get(j).addScore(weightedScore[0]);
+                    
+                }
+                
+                if (backupRides.get(i).getWalkTime() < backupRides.get(j).getWalkTime()) {
+                    
+                    backupRides.get(i).addScore(weightedScore[1]);
+                    
+                } else if (backupRides.get(j).getWalkTime() < backupRides.get(i).getWalkTime()) {
+                    
+                    backupRides.get(j).addScore(weightedScore[1]);
+                    
+                }
+                
+                if (backupRides.get(i).getTravelTime() < backupRides.get(j).getTravelTime()) {
+                    
+                    backupRides.get(i).addScore(weightedScore[2]);
+                    
+                } else if (backupRides.get(j).getTravelTime() < backupRides.get(i).getTravelTime()) {
+                    
+                    backupRides.get(j).addScore(weightedScore[2]);
+                    
+                }
+                
+                if (backupRides.get(i).getWeather().equalsIgnoreCase("Sunny") &&
+                        backupRides.get(j).getWeather().equalsIgnoreCase("Intense Weather")) {
+                    
+                    backupRides.get(i).addScore(weightedScore[3]);
+                    
+                } else if (backupRides.get(j).getWeather().equalsIgnoreCase("Sunny") &&
+                        backupRides.get(i).getWeather().equalsIgnoreCase("Intense Weather")) {
+                    
+                    backupRides.get(j).addScore(weightedScore[3]);
+                    
+                }
+            }
+        }
+
+
+// BEST BACKUP RIDE RECOMMENDATION
+        
+        if (!backupRides.isEmpty()) {
+            
+            Transportation recommendedBackupRide = backupRides.get(0);
+            
+            for (int i = 1; i < backupRides.size(); i++) {
+                
+                if (backupRides.get(i).getTotalScore() > recommendedBackupRide.getTotalScore()) {
+                    
+                    recommendedBackupRide = backupRides.get(i);
+                    
+                }
+            }
+            
+            System.out.println("\nThe Best Backup Ride for you is:");
+            
+            System.out.println("\n" + recommendedBackupRide);
+            
+            System.out.println("Total Score: " + recommendedBackupRide.getTotalScore());
+            
+        } else {
+            
+            System.out.println("\nThere are no backup rides available for you currently.");
+            
         }
         
         
