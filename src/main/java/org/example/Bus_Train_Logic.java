@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class Bus_Train_Logic {
     
     private boolean backupRideViable;
     
-    private double maxBadWeatherWalk = 10;
+    private double maxBadWeatherWalk = 20;
     
     //Stores all buses, trains, and backuprides that are viable for the
     //Recommendation_Algorithm class
@@ -47,16 +48,22 @@ public class Bus_Train_Logic {
     
     private ArrayList<Transportation> viableBackupRides = new ArrayList<>();
     
+    //Stores the true/false value of every proposition for each vehicle so results can be explained later
+    private HashMap<Transportation, Map<String, Boolean>> evaluations = new HashMap<>();
+    
     private Bus_Train_Input bTInput;
     
-    private Node busRule = Node.allOf(
-            Node.var("B"), Node.var("F_bus"), Node.var("D_bus"));
+    private LogicNode busRule = LogicNode.allOf(
+            LogicNode.var("B"), LogicNode.var("F_bus"), LogicNode.var("D_bus"),
+            LogicNode.var("W"));
     
-    private Node trainRule = Node.allOf(
-            Node.var("T"), Node.var("F_train"), Node.var("D_train"), Node.var("W"));
+    private LogicNode trainRule = LogicNode.allOf(
+            LogicNode.var("T"), LogicNode.var("F_train"), LogicNode.var("D_train"),
+            LogicNode.var("W"));
     
-    private Node backupRule = Node.allOf(
-            Node.var("R"), Node.var("F_backup"), Node.var("D_backup"));
+    private LogicNode backupRule = LogicNode.allOf(
+            LogicNode.var("R"), LogicNode.var("F_backup"), LogicNode.var("D_backup"),
+            LogicNode.var("W"));
     
     public static void main(String[] args) {
         
@@ -72,6 +79,72 @@ public class Bus_Train_Logic {
         this.busOp = busOp;
     }
     
+    public void explainEligibility() {
+        
+        explainResults(bTInput.getBuses(), busRule);
+        
+        explainResults(bTInput.getTrains(), trainRule);
+        
+        explainResults(bTInput.getBackupRides(), backupRule);
+        
+    }
+    
+    private void explainResults(ArrayList<Transportation> vehicles, LogicNode rule) {
+        
+        for (Transportation vehicle : vehicles) {
+            
+            Map<String, Boolean> env = evaluations.get(vehicle);
+            
+            if (rule.eval(env)) {
+                
+                System.out.println("\n" + vehicle.getVehicleName() + " is eligible because:");
+                
+                for (String proposition : rule.variables()) {
+                    
+                    System.out.println(" - " + describe(proposition, vehicle, true));
+                    
+                }
+                
+            } else {
+                
+                System.out.println("\n" + vehicle.getVehicleName() + " is NOT eligible because:");
+                
+                for (String proposition : rule.failedPropositions(env)) {
+                    
+                    System.out.println(" - " + describe(proposition, vehicle, false));
+                    
+                }
+            }
+        }
+    }
+    
+    private String describe(String proposition, Transportation vehicle, boolean passed) {
+        
+        if (proposition.startsWith("F")) {
+            
+            return "the fare (" + vehicle.getFare() + ") is " + (passed ? "within" : "over")
+                    + " your budget (" + bTInput.getBudget() + ")";
+            
+        } else if (proposition.startsWith("D")) {
+            
+            LocalTime arrival = bTInput.getCurrentTime()
+                    .plusMinutes((long) Math.ceil(vehicle.getWalkTime() + vehicle.getTravelTime()));
+            
+            return "you would arrive at " + arrival + ", which is " + (passed ? "before" : "not before")
+                    + " the deadline of " + vehicle.getDeadline();
+            
+        } else if (proposition.equals("W")) {
+            
+            return "walking conditions are " + (passed ? "" : "not ") + "acceptable ("
+                    + vehicle.getWeather() + ", " + vehicle.getWalkTime() + " minute walk)";
+            
+        } else {
+            
+            return "the service is " + (passed ? "" : "not ") + "operating";
+            
+        }
+    }
+    
     //
     public void evaluateLogic() {
         
@@ -84,6 +157,8 @@ public class Bus_Train_Logic {
         viableTrains.clear();
         
         viableBackupRides.clear();
+        
+        evaluations.clear();
         
         /*Uses the user input from the getbuses() method, uses stream to analyze the
         * transportation ArrayList, then checks if the serviceOperation in the ArrayList is true or false*/
@@ -137,14 +212,24 @@ public class Bus_Train_Logic {
         for (Transportation bus : bTInput.getBuses()) {
             
             Map<String, Boolean> env = new HashMap<>();
+            
             env.put("B", bus.getServiceOperation());
+            
             env.put("F_bus", bus.getFare() <= bTInput.getBudget());
+            
             env.put("D_bus", bTInput.getCurrentTime()
                     .plusMinutes((long) Math.ceil(bus.getWalkTime() + bus.getTravelTime()))
                     .isBefore(bus.getDeadline()));
             
-            if (BUS_RULE.eval(env)) {
+            env.put("W", bus.getWeather().equalsIgnoreCase("Sunny")
+                    || bus.getWalkTime() <= maxBadWeatherWalk);
+            
+            evaluations.put(bus, env);
+            
+            if (busRule.eval(env)) {
+                
                 viableBuses.add(bus);
+                
             }
         }
 
@@ -152,27 +237,48 @@ public class Bus_Train_Logic {
         for (Transportation train : bTInput.getTrains()) {
             
             Map<String, Boolean> env = new HashMap<>();
+            
             env.put("T", train.getServiceOperation());
+            
             env.put("F_train", train.getFare() <= bTInput.getBudget());
-            env.put("D_bus", bTInput.getCurrentTime()
+            
+            env.put("D_train", bTInput.getCurrentTime()
                     .plusMinutes((long) Math.ceil(train.getWalkTime() + train.getTravelTime()))
                     .isBefore(train.getDeadline()));
             
-            if (TRAIN_RULE.eval(env)) {
+            env.put("W", train.getWeather().equalsIgnoreCase("Sunny")
+                    || train.getWalkTime() <= maxBadWeatherWalk);
+            
+            evaluations.put(train, env);
+            
+            if (trainRule.eval(env)) {
+                
                 viableTrains.add(train);
+                
             }
         }
         //Checks each individual backupRide to see if they're valid for recommendation_algorithm
         for (Transportation backupRide : bTInput.getBackupRides()) {
+            
             Map<String, Boolean> env = new HashMap<>();
+            
             env.put("R", backupRide.getServiceOperation());
-            env.put("F_bus", backupRide.getFare() <= bTInput.getBudget());
-            env.put("D_bus", bTInput.getCurrentTime()
+            
+            env.put("F_backup", backupRide.getFare() <= bTInput.getBudget());
+            
+            env.put("D_backup", bTInput.getCurrentTime()
                     .plusMinutes((long) Math.ceil(backupRide.getWalkTime() + backupRide.getTravelTime()))
                     .isBefore(backupRide.getDeadline()));
             
-            if (BACKUP_RULE.eval(env)) {
-                viableBuses.add(backupRide);
+            env.put("W", backupRide.getWeather().equalsIgnoreCase("Sunny")
+                    || backupRide.getWalkTime() <= maxBadWeatherWalk);
+            
+            evaluations.put(backupRide, env);
+            
+            if (backupRule.eval(env)) {
+                
+                viableBackupRides.add(backupRide);
+                
             }
         }
         
@@ -197,6 +303,93 @@ public class Bus_Train_Logic {
         backupRideDeadlineOp = bTInput.getBackupRides().stream().anyMatch(backupRide ->
                 bTInput.getCurrentTime().plusMinutes((long) Math.ceil(backupRide.getWalkTime()
                         + backupRide.getTravelTime())).isBefore(backupRide.getDeadline()));
+    }
+    
+    public void printDecisionTree(Transportation bestTransportation) {
+        
+        System.out.println("\nDecision tree:");
+        
+        decisionPath(bTInput.getBuses(), busRule, bestTransportation);
+        
+        decisionPath(bTInput.getTrains(), trainRule, bestTransportation);
+        
+        decisionPath(bTInput.getBackupRides(), backupRule, bestTransportation);
+        
+        System.out.println("\nFinal step: which eligible option has the highest weighted score?");
+        
+        if (bestTransportation == null) {
+            
+            System.out.println("  -> No eligible option, so there is no recommendation");
+            
+        } else {
+            
+            System.out.println("  -> " + bestTransportation.getVehicleName() + " (score " + bestTransportation.getTotalScore()
+                    + ") is RECOMMENDED");
+            
+        }
+        
+    }
+    
+    private void decisionPath(ArrayList<Transportation> vehicles, LogicNode rule,
+                              Transportation bestTransportation) {
+        
+        for (Transportation vehicle : vehicles) {
+            
+            Map<String, Boolean> env = evaluations.get(vehicle);
+            
+            System.out.println("\n" + vehicle.getVehicleName());
+            
+            boolean eligible = true;
+            
+            //Asks each question in the same order as the rule. Stops at the first NO branch.
+            for (String proposition : rule.variables()) {
+                
+                boolean answer = env.get(proposition);
+                
+                System.out.println("   " + questions(proposition, vehicle) + " " + (answer ? "YES" : "NO"));
+                
+                if (!answer) {
+                    
+                    System.out.println("   " + "  -> NOT eligible");
+                    
+                    eligible = false;
+                    
+                    break;
+                }
+                
+            }
+            
+            if (eligible) {
+                
+                System.out.println("    " + "-> ELIGIBLE" + (vehicle == bestTransportation ? " (RECOMMENDED)" : ""));
+                
+            }
+        }
+    }
+    
+    private String questions(String proposition, Transportation vehicle) {
+        
+        if (proposition.startsWith("F")) {
+            
+            return "Is the fare within budget (" + vehicle.getFare() + " vs " + bTInput.getBudget() + ")?";
+            
+        } else if (proposition.startsWith("D")) {
+            
+            LocalTime arrival = bTInput.getCurrentTime()
+                    .plusMinutes((long) Math.ceil(vehicle.getWalkTime() + vehicle.getTravelTime()));
+            
+            return "Will arrival (" + arrival + ") meet the deadline (" + vehicle.getDeadline() + ")?";
+            
+        } else if (proposition.equals("W")) {
+            
+            return "Are walking conditions acceptable (" + vehicle.getWeather() + ", "
+                    + vehicle.getWalkTime() + " minute walk)?";
+            
+        } else {
+            
+            return "Is the service operating?";
+            
+        }
     }
     
     //All Class Getters
@@ -297,15 +490,15 @@ public class Bus_Train_Logic {
     }
     
     public LogicNode getBusRule() {
-        return BUS_RULE;
+        return busRule;
     }
     
     public LogicNode getTrainRule() {
-        return TRAIN_RULE;
+        return trainRule;
     }
     
     public LogicNode getBackupRule() {
-        return BACKUP_RULE;
+        return backupRule;
     }
     
 /*busViable = busOp && busFareOp && busDeadlineOp;

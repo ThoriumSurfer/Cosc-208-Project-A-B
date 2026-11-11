@@ -23,6 +23,9 @@ public class Recommendation_Algorithm {
     
     private Scanner userInput;
     
+    //Remembers the overall winner so the decision tree can end with it
+    private Transportation bestVehicleOverall;
+    
     //Holds which variable will have the highest weighted score
     private int[] priorities = new int[4];
     
@@ -460,6 +463,8 @@ public class Recommendation_Algorithm {
                 }
             }
             
+            bestVehicleOverall = recommendedOverall;
+            
             System.out.println("\nThe Best Transportation for your current needs:");
             
             System.out.println("\n" + recommendedOverall);
@@ -471,6 +476,12 @@ public class Recommendation_Algorithm {
             System.out.println("\nNo transportation options available for you currently.");
             
         }
+    }
+    
+    public Transportation getBestVehicleOverall() {
+        
+        return bestVehicleOverall;
+        
     }
     
 }

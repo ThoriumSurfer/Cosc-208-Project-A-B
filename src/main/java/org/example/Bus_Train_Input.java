@@ -3,6 +3,8 @@ package org.example;
 //import org.example.InvalidWeatherException;
 
 import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -55,8 +57,6 @@ public class Bus_Train_Input {
     
     private ArrayList<Transportation> backupRides = new ArrayList<>();
     
-    private Transportation backupRideObject;
-    
     private ArrayList<Transportation> buses = new ArrayList<>();
     
     private ArrayList<Transportation> trains = new ArrayList<>();
@@ -64,6 +64,8 @@ public class Bus_Train_Input {
     private Transportation busObject;
     
     private Transportation trainObject;
+    
+    private Transportation backupRideObject;
     
     public static void main(String[] args) {
 
