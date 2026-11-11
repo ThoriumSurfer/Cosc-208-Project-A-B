@@ -50,6 +50,10 @@ public class Main {
                 
                 input.Budget_Input();
                 
+                input.Departure_Input();
+                
+                input.Deadline_Input();
+                
                 while (endLoop.equalsIgnoreCase("yes")) {
                     
                     input.Bus_Inputs();
@@ -109,11 +113,21 @@ public class Main {
         //Evaluate the bus and train propositions to see if they ae eligible for comparison
         logic.evaluateLogic();
         
+        TruthTable.print("TrainEligible", logic.getTrainRule());
+        
+        System.out.println("\nExpression tree traversals for TrainEligible:");
+        System.out.println("Preorder:  " + logic.getTrainRule().preorder());
+        System.out.println("Inorder:   " + logic.getTrainRule().inorder());
+        System.out.println("Postorder: " + logic.getTrainRule().postorder());
+        
         //Sets up object for the Recommendation_Algorithm that uses input and logic as arguments then
         //use it to call the determine_priority() Method.
         Recommendation_Algorithm recommendation = new Recommendation_Algorithm(input, logic);
         
         recommendation.Determine_Priority();
+        
+        TruthTable.print("TrainEligible", logic.getTrainRule());
+        System.out.println(logic.getTrainRule().preorder());
         
     }
     

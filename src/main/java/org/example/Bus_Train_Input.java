@@ -50,6 +50,9 @@ public class Bus_Train_Input {
     
     private double backupRideFare;
     
+    /*These Transportation Class Arraylists will store the values inputted from the user
+    as many tiems as they need*/
+    
     private ArrayList<Transportation> backupRides = new ArrayList<>();
     
     private Transportation backupRideObject;
@@ -66,6 +69,7 @@ public class Bus_Train_Input {
 
     }
     
+    //Constructor for all variables in this Class
     public Bus_Train_Input() {
         this.deadline = deadline;
         this.currentTime = currentTime;
@@ -81,6 +85,7 @@ public class Bus_Train_Input {
         this.trainFare = trainFare;
     }
     
+    //Records user's Budget once at the start
     public void Budget_Input() {
         
         System.out.println("\nEnter your budget: ");
@@ -90,6 +95,62 @@ public class Bus_Train_Input {
         userInput.nextLine();
     }
     
+    public void Departure_Input() {
+        
+        while (true) {
+            
+            System.out.println("\nEnter your departure time (HH:mm), or press Enter to use the current time: ");
+            
+            String answer = userInput.nextLine().trim();
+            
+            if (answer.isEmpty()) {
+                
+                currentTime = LocalTime.now().withSecond(0).withNano(0);
+                
+                break;
+            }
+            
+            try {
+                
+                currentTime = LocalTime.parse(answer);
+                
+                break;
+            
+            } catch (DateTimeParseException e) {
+                
+                System.out.println("\nThat time is invalid, please use HH:mm (for example 08:15).");
+            
+            }
+        }
+        
+        System.out.println("Using departure time: " + currentTime);
+        
+    }
+    
+    public void Deadline_Input() {
+        
+        boolean valid = false;
+        
+        while (!valid) {
+            
+            try {
+                
+                System.out.println("\nPlease enter your arrival deadline (HH:mm): ");
+                
+                deadline = LocalTime.parse(userInput.nextLine().trim());
+                
+                valid = true;
+                
+            } catch (DateTimeParseException e) {
+                
+                System.out.println("\nThat time is invalid, please use HH:mm (for example 09:00).");
+                
+            }
+        }
+    }
+    
+    /*This Method is what takes the user's inputs for all buses. Deadline, Serviceanswer, busfare,
+    * busWalkTIme, busTravelTime, weather, and creates busObjects */
     public void Bus_Inputs ()
     {
         boolean validInput = false;
@@ -97,12 +158,10 @@ public class Bus_Train_Input {
         while (!validInput) {
             try {
                 
-                System.out.println("\nPlease insert the deadline for the bus arrival (HH:mm): ");
-                deadline = LocalTime.parse(userInput.nextLine());
-                
                 System.out.println("\nIs the bus in service? Please type yes or no: ");
                 String serviceAnswer = userInput.nextLine();
-                
+                //Determines if they inputted yes or no, if user inputs neither then throw
+                //custom exception
                 if (!serviceAnswer.equalsIgnoreCase("Yes") &&
                         !serviceAnswer.equalsIgnoreCase("No")
                         ) {
@@ -128,6 +187,8 @@ public class Bus_Train_Input {
                 System.out.println("\nPlease enter either 'Sunny' or 'Intense Weather: ");
                 weather = userInput.nextLine();
                 
+                //Determines if they inputted yes or no, if user inputs neither then throw
+                //custom exception
                 if (!weather.equalsIgnoreCase("Sunny") &&
                         !weather.equalsIgnoreCase("Intense Weather")) {
                     
@@ -146,6 +207,8 @@ public class Bus_Train_Input {
             }
         }
         
+        //This bus object is created to store all of these values so it can be added all at once to the
+        //buses arraylist
         busObject = new Transportation("Bus " + (buses.size() + 1),
                 busFare, busWalkTime, busTravelTime, weather, busService, deadline);
         
@@ -161,18 +224,18 @@ public class Bus_Train_Input {
         
     }
     
+    /*This Method is what takes the user's inputs for all trains. Deadline, Serviceanswer, trainfare,
+     * trainWalkTIme, trainTravelTime, weather, and creates trainObjects */
     public void Train_Inputs () {
         boolean validInput = false;
         
         while (!validInput) {
             try {
                 
-                System.out.println("\nPlease insert the deadline for the train arrival (HH:mm): ");
-                deadline = LocalTime.parse(userInput.nextLine());
-                
                 System.out.println("\nIs the train in service? Please type yes or no: ");
                 String serviceAnswer = userInput.nextLine();
-                
+                //Determines if they inputted yes or no, if user inputs neither then throw
+                //custom exception
                 if (!serviceAnswer.equalsIgnoreCase("Yes") &&
                         !serviceAnswer.equalsIgnoreCase("No")) {
                     
@@ -197,7 +260,8 @@ public class Bus_Train_Input {
                 
                 System.out.println("\nPlease enter either 'Sunny' or 'Intense Weather: ");
                 weather = userInput.nextLine();
-                
+                //Determines if they inputted yes or no, if user inputs neither then throw
+                //custom exception
                 if (!weather.equalsIgnoreCase("Sunny") &&
                         !weather.equalsIgnoreCase("Intense Weather")) {
                     
@@ -218,7 +282,8 @@ public class Bus_Train_Input {
                 
             }
         }
-        
+        //This train object is created to store all of these values so it can be added all at once to the
+        //trains arraylist
         trainObject = new Transportation("Train " + (trains.size() + 1),
                 trainFare, trainWalkTime, trainTravelTime, weather, trainService, deadline);
         
@@ -234,18 +299,19 @@ public class Bus_Train_Input {
         
     }
     
+    /*This Method is what takes the user's inputs for all backuprides. Deadline, Serviceanswer,
+    backupRideFare, backupRideWalkTIme, backupRideTravelTime, weather,
+    and creates backupRideObjects */
     public void Backup_Ride_Inputs() {
         boolean validInput = false;
         
         while (!validInput) {
             try {
                 
-                System.out.println("\nPlease insert the deadline for the backup ride arrival (HH:mm): ");
-                deadline = LocalTime.parse(userInput.nextLine());
-                
                 System.out.println("\nIs the backup ride available? Please type yes or no: ");
                 String serviceAnswer = userInput.nextLine();
-                
+                //Determines if they inputted yes or no, if user inputs neither then throw
+                //custom exception
                 if (!serviceAnswer.equalsIgnoreCase("Yes") &&
                         !serviceAnswer.equalsIgnoreCase("No")) {
                     
@@ -270,7 +336,8 @@ public class Bus_Train_Input {
                 
                 System.out.println("\nPlease enter either 'Sunny' or 'Intense Weather': ");
                 weather = userInput.nextLine();
-                
+                //Determines if they inputted yes or no, if user inputs neither then throw
+                //custom exception
                 if (!weather.equalsIgnoreCase("Sunny") &&
                         !weather.equalsIgnoreCase("Intense Weather")) {
                     
@@ -291,7 +358,8 @@ public class Bus_Train_Input {
                 
             }
         }
-        
+        //This backupRide object is created to store all of these values so it can be
+        // added all at once to the backupRide arraylist
         backupRideObject = new Transportation("Backup Ride " + (backupRides.size() + 1),
                 backupRideFare, backupRideWalkTime, backupRideTravelTime, weather, backupRideService, deadline);
         
@@ -306,6 +374,7 @@ public class Bus_Train_Input {
         }
     }
     
+    //All class Getters
     public LocalTime getDeadline() {
         
         return deadline;

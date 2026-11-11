@@ -2,6 +2,8 @@ package org.example;
 
 import java.time.LocalTime;
 
+//Determines how the objects within the ArrayLists behave they use, Vehiclename, fare, walkTime, travelTime, weather
+//serviceoperation, AND deadline
 public class Transportation {
     
     private double fare;
@@ -14,11 +16,11 @@ public class Transportation {
     private LocalTime deadline;
     
     public static void main(String[] args) {
-        
-        System.out.println("Hello, World!");
+    
         
     }
     
+    //Class Constructor
     public Transportation(String vehicleName, double fare, double walkTime, double travelTime,
                           String weather, boolean serviceOperation, LocalTime deadline) {
         this.vehicleName = vehicleName;
@@ -30,6 +32,7 @@ public class Transportation {
         this.deadline = deadline;
     }
     
+    //All Getters
     public double getFare() {
         
         return fare;
@@ -77,10 +80,12 @@ public class Transportation {
     }
     
     public LocalTime getDeadline() {
+        
         return deadline;
+        
     }
     
-    
+    //Allows for a proper display when printing the entire ArrayList as a string
     @Override
     public String toString() {
         return "Vehicle: " + vehicleName + " \nFare: " + fare + ", Walking Time: " + walkTime +

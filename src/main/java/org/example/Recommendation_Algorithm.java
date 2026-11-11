@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+/*The main Bulk of the program, compares all Buses, Trains, and backupRides between each respective vehicle's arraylist
+and each other to determine the best mode of transportation for each and the best transportation overall using a
+weighted score system where the user will input what aspect of each transportation system they value more*/
 public class Recommendation_Algorithm {
     
+    //The first 4 determine the scores between the vehicles within arraylist and totalscore helps determine the best
+    //method of transportation overall
     private int fareScore;
     
     private int weatherScore;
@@ -18,10 +23,12 @@ public class Recommendation_Algorithm {
     
     private Scanner userInput;
     
+    //Holds which variable will have the highest weighted score
     private int[] priorities = new int[4];
     
     private int[] weightedScore = new int[4];
     
+    //These 4 arraylists hold all of the vehicles that will be compared and recommended
     private ArrayList<Transportation> buses;
     
     private ArrayList<Transportation> trains;
@@ -30,6 +37,7 @@ public class Recommendation_Algorithm {
     
     private ArrayList<Transportation> totalTransport = new ArrayList<>();
     
+    //input from Bus_Train_Input class
     private Bus_Train_Input input;
     
     
@@ -37,6 +45,7 @@ public class Recommendation_Algorithm {
     
     }
     
+    //Constructor for Recommendation_algorithm Class
     public Recommendation_Algorithm(Bus_Train_Input input, Bus_Train_Logic logic) {
         this.input = input;
         this.userInput = input.getUserInput();
@@ -48,8 +57,10 @@ public class Recommendation_Algorithm {
         totalTransport.addAll(backupRides);
     }
     
+    //Will Determine which methods of vehicles are best and print them back out to the user!
     public void Determine_Priority() {
         
+        //The 4 individual categories that will Determine the best mdoe of transportation
         String[] categories = {
                 "Fare", "Walking Time", "Travel Time", "Weather"
         };
@@ -62,6 +73,8 @@ public class Recommendation_Algorithm {
             do {
                 validScore = true;
                 
+                //try catch will ask the user to input which of the 4 variables they value the most in their
+                //vehicle ranking
                 try {
                     System.out.println("\nHow much do you prioritize " + categories[i] + " use 1 to 4, 4 " +
                             "being the most important and 1 being least important (1-4): ");
@@ -78,6 +91,7 @@ public class Recommendation_Algorithm {
                     
                 }
                 
+                //Multiple checks to see if the user actually inputed 1-4 and has not repeated as score
                 if (choice < 1 || choice > 4) {
                     
                     validScore = false;
@@ -102,6 +116,7 @@ public class Recommendation_Algorithm {
             } while (!validScore);
         }
         
+        //How much each score will be increased starting from 1 being inputted up to 4
         int[] priorityWeights = {1, 3, 6, 10};
         
         for (int i = 0; i < priorities.length; i++) {
@@ -110,40 +125,50 @@ public class Recommendation_Algorithm {
             
         }
         
-        // RESET ALL SCORES
+        //Resets all Scores
         for (Transportation transport : totalTransport) {
             transport.resetScore();
         }
         
         
-        // BUS-ONLY SCORING
+        //Bus only scoring
         
         for (int i = 0; i < buses.size(); i++) {
             
             for (int j = i + 1; j < buses.size(); j++) {
                 
                 if (buses.get(i).getFare() < buses.get(j).getFare()) {
+                    
                     buses.get(i).addScore(weightedScore[0]);
                     
                 } else if (buses.get(j).getFare() < buses.get(i).getFare()) {
+                    
                     buses.get(j).addScore(weightedScore[0]);
+                    
                 }
                 
                 if (buses.get(i).getWalkTime() < buses.get(j).getWalkTime()) {
+                   
                     buses.get(i).addScore(weightedScore[1]);
                     
                 } else if (buses.get(j).getWalkTime() < buses.get(i).getWalkTime()) {
+                    
                     buses.get(j).addScore(weightedScore[1]);
+                    
                 }
                 
                 if (buses.get(i).getTravelTime() < buses.get(j).getTravelTime()) {
+                    
                     buses.get(i).addScore(weightedScore[2]);
                     
                 } else if (buses.get(j).getTravelTime() < buses.get(i).getTravelTime()) {
+                    
                     buses.get(j).addScore(weightedScore[2]);
+                    
                 }
                 
                 if (buses.get(i).getWeather().equalsIgnoreCase("Sunny") &&
+                        
                         buses.get(j).getWeather().equalsIgnoreCase("Intense Weather")) {
                     
                     buses.get(i).addScore(weightedScore[3]);
@@ -152,12 +177,13 @@ public class Recommendation_Algorithm {
                         buses.get(i).getWeather().equalsIgnoreCase("Intense Weather")) {
                     
                     buses.get(j).addScore(weightedScore[3]);
+                    
                 }
             }
         }
         
         
-        // BEST BUS RECOMMENDATION
+        //Recommends the best bus
         
         if (!buses.isEmpty()) {
             
@@ -166,7 +192,9 @@ public class Recommendation_Algorithm {
             for (int i = 1; i < buses.size(); i++) {
                 
                 if (buses.get(i).getTotalScore() > recommendedBus.getTotalScore()) {
+                    
                     recommendedBus = buses.get(i);
+                    
                 }
             }
             
@@ -183,7 +211,7 @@ public class Recommendation_Algorithm {
         }
         
         
-        // RESET SCORES BEFORE TRAIN SCORING
+        //Resets the scores before scoring the trains
         
         for (Transportation transport : totalTransport) {
             
@@ -192,7 +220,7 @@ public class Recommendation_Algorithm {
         }
         
         
-        // TRAIN-ONLY SCORING
+        //Train only scoring
         
         for (int i = 0; i < trains.size(); i++) {
             
@@ -245,7 +273,7 @@ public class Recommendation_Algorithm {
         }
         
         
-        // BEST TRAIN RECOMMENDATION
+        //Recommends the best Trains
         
         if (!trains.isEmpty()) {
             
@@ -254,7 +282,9 @@ public class Recommendation_Algorithm {
             for (int i = 1; i < trains.size(); i++) {
                 
                 if (trains.get(i).getTotalScore() > recommendedTrain.getTotalScore()) {
+                    
                     recommendedTrain = trains.get(i);
+                    
                 }
             }
             
@@ -275,7 +305,7 @@ public class Recommendation_Algorithm {
         }
 
 
-// BACKUP RIDE-ONLY SCORING
+// BackupRide only scoring
         
         for (int i = 0; i < backupRides.size(); i++) {
             
@@ -326,7 +356,7 @@ public class Recommendation_Algorithm {
         }
 
 
-// BEST BACKUP RIDE RECOMMENDATION
+        //Recommends the best backupRide
         
         if (!backupRides.isEmpty()) {
             
@@ -354,14 +384,14 @@ public class Recommendation_Algorithm {
         }
         
         
-        // RESET SCORES BEFORE OVERALL SCORING
+        //Resets scores before scoring all transports together
         
         for (Transportation transport : totalTransport) {
             transport.resetScore();
         }
         
         
-        // OVERALL SCORING: BUSES VS TRAINS
+        //Scores Buses vs Trains Vs backupRides
         
         for (int i = 0; i < totalTransport.size(); i++) {
             
@@ -415,7 +445,7 @@ public class Recommendation_Algorithm {
         }
         
         
-        // BEST OVERALL RECOMMENDATION
+        //Recommends the absolute best transportation for the user
         
         if (!totalTransport.isEmpty()) {
             
