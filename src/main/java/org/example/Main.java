@@ -115,6 +115,8 @@ public class Main {
         
         logic.explainEligibility();
         
+        //Prints out traineligibility truth table to see which are able to be compared and
+        //recommended
         TruthTable.print("TrainEligible", logic.getTrainRule());
         
         System.out.println("\nExpression tree traversals for TrainEligible:");
@@ -131,10 +133,11 @@ public class Main {
         
         recommendation.Determine_Priority();
         
+        //Prints DecisionTree
         logic.printDecisionTree(recommendation.getBestVehicleOverall());
         
-        TruthTable.print("TrainEligible", logic.getTrainRule());
-        System.out.println(logic.getTrainRule().preorder());
+        //Prints out Knowledge Graph
+        logic.printKnowledgeGraph(recommendation.getBestVehicleOverall());
         
     }
     

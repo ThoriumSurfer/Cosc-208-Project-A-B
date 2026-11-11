@@ -53,6 +53,8 @@ public class Bus_Train_Logic {
     
     private Bus_Train_Input bTInput;
     
+    //Each rule is an expression tree of AND nodes. A vehicle is eligible only if every proposition is true:
+    //service operating, fare within budget, arrives before the deadline, and walking conditions acceptable
     private LogicNode busRule = LogicNode.allOf(
             LogicNode.var("B"), LogicNode.var("F_bus"), LogicNode.var("D_bus"),
             LogicNode.var("W"));
@@ -142,6 +144,80 @@ public class Bus_Train_Logic {
             
             return "the service is " + (passed ? "" : "not ") + "operating";
             
+        }
+    }
+    
+    public void printKnowledgeGraph(Transportation bestTransportation) {
+        
+        KnowledgeGraph graph = new KnowledgeGraph();
+        
+        graph.addEdge("Maya", "needs to reach", "Campus");
+        
+        graph.addEdge("Maya", "has budget", "Budget " + bTInput.getBudget());
+        
+        graph.addEdge("Maya", "must arrive before", "Deadline " + bTInput.getDeadline());
+        
+        addVehiclesToGraph(graph, bTInput.getBuses(), busRule, bestTransportation);
+        
+        addVehiclesToGraph(graph, bTInput.getTrains(), trainRule, bestTransportation);
+        
+        addVehiclesToGraph(graph, bTInput.getBackupRides(), backupRule, bestTransportation);
+        
+        graph.print();
+        
+    }
+    
+    private void addVehiclesToGraph(KnowledgeGraph graph, ArrayList<Transportation> vehicles,
+                                    LogicNode rule, Transportation bestTransportation) {
+        
+        for (Transportation vehicle : vehicles) {
+            
+            Map<String, Boolean> env = evaluations.get(vehicle);
+            
+            String name = vehicle.getVehicleName();
+            
+            String fare = "Fare " + vehicle.getFare();
+            
+            LocalTime arrival = bTInput.getCurrentTime()
+                    .plusMinutes((long) Math.ceil(vehicle.getWalkTime() + vehicle.getTravelTime()));
+            
+            graph.addEdge("Maya", "can take", name);
+            
+            graph.addEdge(name, "goes to", "Campus");
+            
+            graph.addEdge(name, "service is", vehicle.getServiceOperation() ? "Operating" : "Not operating");
+            
+            graph.addEdge(name, "costs", fare);
+            
+            graph.addEdge(fare, vehicle.getFare() <= bTInput.getBudget() ? "is within" : "is over",
+                    "Budget " + bTInput.getBudget());
+            
+            graph.addEdge(name, "affected by", "Weather " + vehicle.getWeather());
+            
+            graph.addEdge(name, "arrives at", "Arrival " + arrival);
+            
+            //Reads the deadline answer (D_bus, D_train, or D_backup) that was stored for this vehicle
+            boolean meetsDeadline = false;
+            
+            for (String proposition : env.keySet()) {
+                
+                if (proposition.startsWith("D")) {
+                    
+                    meetsDeadline = env.get(proposition);
+                    
+                }
+            }
+            
+            graph.addEdge("Arrival " + arrival, meetsDeadline ? "is before" : "is not before",
+                    "Deadline " + vehicle.getDeadline());
+            
+            graph.addEdge(name, rule.eval(env) ? "is" : "is not", "Eligible");
+            
+            if (vehicle == bestTransportation) {
+                
+                graph.addEdge("Maya", "is recommended", name);
+                
+            }
         }
     }
     

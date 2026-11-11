@@ -27,13 +27,29 @@ public class LogicNode {
     }
     
     // ---------- Builders ----------
-    public static LogicNode var(String name) { return new LogicNode(Op.VAR, name, null, null); }
+    public static LogicNode var(String name) {
+        
+        return new LogicNode(Op.VAR, name, null, null);
     
-    public static LogicNode not(LogicNode child)  { return new LogicNode(Op.NOT, null, child, null); }
+    }
     
-    public static LogicNode and(LogicNode l, LogicNode r) { return new LogicNode(Op.AND, null, l, r); }
+    public static LogicNode not(LogicNode child)  {
+        
+        return new LogicNode(Op.NOT, null, child, null);
     
-    public static LogicNode or(LogicNode l, LogicNode r)  { return new LogicNode(Op.OR, null, l, r); }
+    }
+    
+    public static LogicNode and(LogicNode l, LogicNode r) {
+        
+        return new LogicNode(Op.AND, null, l, r);
+    
+    }
+    
+    public static LogicNode or(LogicNode l, LogicNode r)  {
+        
+        return new LogicNode(Op.OR, null, l, r);
+        
+    }
     
     /** a ∧ b ∧ c ∧ ... built left-associatively: ((a ∧ b) ∧ c) ∧ ... */
     public static LogicNode allOf(LogicNode first, LogicNode... rest) {
