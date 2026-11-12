@@ -74,13 +74,18 @@ public class Bus_Train_Logic {
     
     //Constructor that utilizes the user input from the Bus_Train_Input class
     public Bus_Train_Logic(Bus_Train_Input bTInput) {
+        
         this.bTInput = bTInput;
+        
     }
     
     public Bus_Train_Logic(boolean busOp) {
+        
         this.busOp = busOp;
+        
     }
-    
+    //Prints an "eligible because" or "NOT eligible because" explanation for
+    //every bus, train, and backup ride
     public void explainEligibility() {
         
         explainResults(bTInput.getBuses(), busRule);

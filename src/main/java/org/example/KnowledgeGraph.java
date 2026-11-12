@@ -58,6 +58,7 @@ public class KnowledgeGraph {
         
     }
     
+    //Prints out the knowledge graph
     public void print() {
         
         System.out.println("\nKnowledge graph:");
